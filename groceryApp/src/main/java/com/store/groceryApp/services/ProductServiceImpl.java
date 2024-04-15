@@ -16,7 +16,7 @@ import com.store.groceryApp.repository.ProductRepository;
 import com.store.groceryApp.repository.UserRepository;
 
 @Service
-public class ProductServiceImpl {
+public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository productRepository;
 
@@ -26,12 +26,14 @@ public class ProductServiceImpl {
     @Autowired
     private CartRepository cartRepository;
 
+    @Override
     @Transactional(readOnly = true)
     public ProductDto getProductByName(String productName) {
         ProductEntity productEntity = productRepository.findByName(productName);
         return productEntity != null ? new ProductDto(productEntity) : null;
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<ProductDto> getProductsByCategory(String category) {
         List<ProductEntity> productEntities = productRepository.findByCategory(category);
@@ -40,6 +42,7 @@ public class ProductServiceImpl {
             .collect(Collectors.toList());
     }
 
+    @Override
     @Transactional
     public void addToCart(Long productId, Long userId, int quantity) {
         ProductEntity product = productRepository.findById(productId).orElse(null);
@@ -59,17 +62,20 @@ public class ProductServiceImpl {
         }
     }
 
+    @Override
     @Transactional
     public void addProduct(ProductDto productDto) {
         ProductEntity productEntity = new ProductEntity(productDto);
         productRepository.save(productEntity);
     }
 
+    @Override
     @Transactional
     public void deleteProduct(Long productId) {
         productRepository.deleteById(productId);
     }
 
+    @Override
     @Transactional
     public void updatePrice(Long productId, double newPrice) {
         ProductEntity productEntity = productRepository.findById(productId).orElse(null);
@@ -79,6 +85,7 @@ public class ProductServiceImpl {
         }
     }
 
+    @Override
     @Transactional
     public void updateStockQuantity(Long productId, int newStockQuantity) {
         ProductEntity productEntity = productRepository.findById(productId).orElse(null);
