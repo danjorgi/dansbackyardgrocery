@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.store.groceryApp.dtos.ProductDto;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -48,11 +49,24 @@ public class ProductEntity {
 
     @ManyToOne
     @JsonBackReference
-    @JoinColumn(name = "admin_id")
+    @JoinColumn(name = "admin")
     private UserEntity admin;
 
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JsonManagedReference
     private Set<CartEntity> cartSet = new HashSet<>();
 
+    public ProductEntity(ProductDto productDto) {
+        if (productDto.getName() != null) {
+            this.name = productDto.getName();
+        }
+        if (productDto.getDescription() != null) {
+            this.description = productDto.getDescription();
+        }
+        this.price = productDto.getPrice();
+        this.stockQuantity = productDto.getStockQuantity();
+        if (productDto.getImageUrl() != null) {
+            this.imageUrl = productDto.getImageUrl();
+        }
+    }
 }

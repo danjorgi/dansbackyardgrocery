@@ -36,8 +36,8 @@ public class CartEntity {
     @JoinColumn(name = "product_id")
     private ProductEntity product;
 
-    @Column(name = "stock")
-    private int stock;
+    @Column(name = "quantity")
+    private int quantity;
 
     @Column(name = "timestamp", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Timestamp timestamp;

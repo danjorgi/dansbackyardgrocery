@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.store.groceryApp.dtos.UserDto;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -50,4 +51,20 @@ public class UserEntity {
     @OneToMany(mappedBy = "admin", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JsonManagedReference
     private Set<ProductEntity> productSet = new HashSet<>();
+
+    public UserEntity(UserDto userDto) {
+        if (userDto.getUserName() != null) {
+            this.userName = userDto.getUserName();
+        }
+        if (userDto.getUserEmail() != null) {
+            this.userEmail = userDto.getUserEmail();
+        }
+        if (userDto.getUserAddress() != null) {
+            this.userAddress = userDto.getUserAddress();
+        }
+        if (userDto.getUserPassword() != null) {
+            this.userPassword = userDto.getUserPassword();
+        }
+        this.admin = userDto.isAdmin();
+    }
 }

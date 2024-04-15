@@ -20,6 +20,7 @@ public class ProductDto implements Serializable {
     private double price;
     private int stockQuantity;
     private String imageUrl;
+    private boolean admin;
     private UserDto userDto;
     private Set<CartDto> cartDtoSet = new HashSet<>();
 
