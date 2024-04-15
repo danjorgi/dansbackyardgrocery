@@ -32,24 +32,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-public List<String> userLogin(UserDto userDto) {
-    List<String> response = new ArrayList<>();
-    Optional<UserEntity> userOptional = userRepository.findByUsername(userDto.getUserName());
-    if (userOptional.isPresent()) {
-        UserEntity user = userOptional.get();
-        if (passwordEncoder.matches(userDto.getUserPassword(), user.getUserPassword())) {
-            if (user.isAdmin()) {
-                response.add("Admin Login Successfull");
+    public List<String> userLogin(UserDto userDto) {
+        List<String> response = new ArrayList<>();
+        Optional<UserEntity> userOptional = userRepository.findByUsername(userDto.getUserName());
+        if (userOptional.isPresent()) {
+            UserEntity user = userOptional.get();
+            if (passwordEncoder.matches(userDto.getUserPassword(), user.getUserPassword())) {
+                if (user.isAdmin()) {
+                    response.add("Admin Login Successfull");
+                } else {
+                    response.add("User Login Successfull");
+                }
+                response.add(String.valueOf(user.getId()));
             } else {
-                response.add("User Login Successfull");
+                response.add("Username or password incorrect");
             }
-            response.add(String.valueOf(user.getId()));
         } else {
             response.add("Username or password incorrect");
         }
-    } else {
-        response.add("Username or password incorrect");
+        return response;
     }
-    return response;
-}
 }

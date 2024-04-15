@@ -20,6 +20,7 @@ public class ProductDto implements Serializable {
     private double price;
     private int stockQuantity;
     private String imageUrl;
+    private String category;
     private boolean admin;
     private UserDto userDto;
     private Set<CartDto> cartDtoSet = new HashSet<>();
@@ -38,6 +39,9 @@ public class ProductDto implements Serializable {
         this.stockQuantity = product.getStockQuantity();
         if (product.getImageUrl() != null) {
             this.imageUrl = product.getImageUrl();
+        }
+        if (product.getCategory() != null) {
+            this.category = product.getCategory();
         }
         if (product.getAdmin() != null) {
             this.admin = product.getAdmin().isAdmin();

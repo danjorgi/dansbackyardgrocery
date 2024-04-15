@@ -47,6 +47,9 @@ public class ProductEntity {
     @Column(name = "image_url", length = 255)
     private String imageUrl;
 
+    @Column(name = "category", length = 50)
+    private String category;
+
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name = "admin")
@@ -67,6 +70,9 @@ public class ProductEntity {
         this.stockQuantity = productDto.getStockQuantity();
         if (productDto.getImageUrl() != null) {
             this.imageUrl = productDto.getImageUrl();
+        }
+        if (productDto.getCategory() != null) {
+            this.category = productDto.getCategory();
         }
         if (productDto.getUserDto() != null) {
             UserEntity userEntity = new UserEntity(productDto.getUserDto());
