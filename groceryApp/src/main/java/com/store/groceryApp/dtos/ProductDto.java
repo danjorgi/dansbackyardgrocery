@@ -32,12 +32,16 @@ public class ProductDto implements Serializable {
             this.name = product.getName();
         }
         if (product.getDescription() != null) {
-            this.name = product.getDescription();
+            this.description = product.getDescription();
         }
         this.price = product.getPrice();
         this.stockQuantity = product.getStockQuantity();
         if (product.getImageUrl() != null) {
             this.imageUrl = product.getImageUrl();
         }
+        if (product.getAdmin() != null) {
+            this.admin = product.getAdmin().isAdmin();
+            this.userDto = new UserDto(product.getAdmin());
+        } 
     }
 }

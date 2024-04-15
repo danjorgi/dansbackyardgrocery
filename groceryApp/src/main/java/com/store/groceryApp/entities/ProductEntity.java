@@ -68,5 +68,9 @@ public class ProductEntity {
         if (productDto.getImageUrl() != null) {
             this.imageUrl = productDto.getImageUrl();
         }
+        if (productDto.getUserDto() != null) {
+            UserEntity userEntity = new UserEntity(productDto.getUserDto());
+            this.admin = userEntity;
+        }
     }
 }

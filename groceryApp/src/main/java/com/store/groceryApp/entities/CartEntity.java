@@ -3,6 +3,7 @@ package com.store.groceryApp.entities;
 import java.sql.Timestamp;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.store.groceryApp.dtos.CartDto;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,4 +42,15 @@ public class CartEntity {
 
     @Column(name = "timestamp", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Timestamp timestamp;
+
+    public CartEntity(CartDto cartDto) {
+        if (cartDto.getUserDto() != null) {
+            this.user = new UserEntity(cartDto.getUserDto());
+        }
+        if (cartDto.getProductDto() != null) {
+            this.product = new ProductEntity(cartDto.getProductDto());
+        }
+        this.quantity = cartDto.getQuantity();
+        this.timestamp = cartDto.getTimestamp();
+    }
 }
