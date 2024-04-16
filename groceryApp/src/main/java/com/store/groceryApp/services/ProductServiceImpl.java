@@ -94,4 +94,8 @@ public class ProductServiceImpl implements ProductService {
             productRepository.save(productEntity);
         }
     }
+
+    public List<ProductEntity> getAllProductsAlphabetically() {
+        return productRepository.findAllByOrderByName();
+    }
 }
