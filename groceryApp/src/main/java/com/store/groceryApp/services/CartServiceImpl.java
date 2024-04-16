@@ -12,21 +12,24 @@ import com.store.groceryApp.repository.CartRepository;
 import com.store.groceryApp.repository.UserRepository;
 
 @Service
-public class CartServiceImpl {
+public class CartServiceImpl implements CartService {
     @Autowired
     private CartRepository cartRepository;
 
     @Autowired
     private UserRepository userRepository;
 
+    @Override
     public List<CartEntity> viewCartItems(Long userId) {
         return cartRepository.findByUserId(userId);
     }
 
+    @Override
     public void deleteCartItem(Long cartItemId) {
         cartRepository.deleteById(cartItemId);
     }
 
+    @Override
     public void updateCartItemQuantity(Long cartItemId, int newQuantity) {
         CartEntity cartItem = cartRepository.findById(cartItemId).orElse(null);
         if (cartItem != null) {
@@ -35,6 +38,7 @@ public class CartServiceImpl {
         }
     }
 
+    @Override
     public void completeOrder(long userId) {
         List<CartEntity> cartItems = cartRepository.findByUserId(userId);
         if (cartItems.isEmpty()) {
