@@ -20,7 +20,7 @@ const handleSubmit = async (e) => {
         address: registerAddress.value
     }
 
-    const response = await fetch('${baseUrl}/register', {
+    const response = await fetch(`${baseUrl}/register`, {
         method: "POST",
         body:JSON.stringify(bodyObj),
         headers: headers
@@ -30,7 +30,7 @@ const handleSubmit = async (e) => {
     const responseArr = await response.json()
 
     if (response.status === 200) {
-        window.location.replace(resonseArr[0])
+        window.location.replace(responseArr[0])
     }
 }
 
