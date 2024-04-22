@@ -1,9 +1,11 @@
 package com.store.groceryApp.controller;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +25,10 @@ public class UserController {
 
     @PostMapping("/register")
     public List<String> addUser(@RequestBody UserDto userDto) {
+        if(!StringUtils.hasText(userDto.getUserPassword())) {
+            return Collections.singletonList("Password cannot be null or empty");
+        }
+
         String passHash = passwordEncoder.encode(userDto.getUserPassword());
         userDto.setUserPassword(passHash);
         return userService.addUser(userDto);
