@@ -43,9 +43,5 @@ public class ProductDto implements Serializable {
         if (product.getCategory() != null) {
             this.category = product.getCategory();
         }
-        if (product.getAdmin() != null) {
-            this.admin = product.getAdmin().isAdmin();
-            this.userDto = new UserDto(product.getAdmin());
-        } 
     }
 }

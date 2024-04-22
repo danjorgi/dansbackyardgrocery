@@ -48,10 +48,6 @@ public class UserEntity {
     @JsonManagedReference
     private Set<CartEntity> cartSet = new HashSet<>();
 
-    @OneToMany(mappedBy = "admin", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JsonManagedReference
-    private Set<ProductEntity> productSet = new HashSet<>();
-
     public UserEntity(UserDto userDto) {
         if (userDto.getUserName() != null) {
             this.userName = userDto.getUserName();
