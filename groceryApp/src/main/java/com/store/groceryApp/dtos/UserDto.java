@@ -37,7 +37,7 @@ public class UserDto implements Serializable {
             this.userAddress = user.getUserAddress();
         }
         if (user.getUserPassword() != null) {
-            this.userPassword = user.getUserAddress();
+            this.userPassword = user.getUserPassword();
         }
         this.admin = user.isAdmin();
     }
