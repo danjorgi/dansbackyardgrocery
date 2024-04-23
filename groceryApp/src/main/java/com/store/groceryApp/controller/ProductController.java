@@ -1,6 +1,7 @@
 package com.store.groceryApp.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.store.groceryApp.dtos.ProductDto;
+import com.store.groceryApp.entities.ProductEntity;
 import com.store.groceryApp.services.ProductService;
 
 @RestController
@@ -45,7 +47,7 @@ public class ProductController {
     }
 
     @PostMapping("/add")
-    public void addProdut(@RequestBody ProductDto productDto) {
+    public void addProduct(@RequestBody ProductDto productDto) {
         productService.addProduct(productDto);
     }
 
@@ -64,5 +66,13 @@ public class ProductController {
     public void updateStockQuantity(@PathVariable Long productId,
                                     @RequestParam int newStockQuantity) {
             productService.updateStockQuantity(productId, newStockQuantity);
+    }
+
+    @GetMapping
+    public List<ProductDto> getAllProducts() {
+        List<ProductEntity> products = productService.getAllProductsAlphabetically();
+        return products.stream()
+                       .map(ProductDto::new)
+                       .collect(Collectors.toList());
     }
 }

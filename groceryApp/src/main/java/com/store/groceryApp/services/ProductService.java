@@ -3,6 +3,7 @@ package com.store.groceryApp.services;
 import java.util.List;
 
 import com.store.groceryApp.dtos.ProductDto;
+import com.store.groceryApp.entities.ProductEntity;
 
 public interface ProductService {
 
@@ -20,4 +21,5 @@ public interface ProductService {
 
     void updateStockQuantity(Long productId, int newStockQuantity);
 
+    List<ProductEntity> getAllProductsAlphabetically();
 }
