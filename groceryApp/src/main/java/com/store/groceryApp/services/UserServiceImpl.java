@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,5 +52,13 @@ public class UserServiceImpl implements UserService {
             response.add("Username or password incorrect");
         }
         return response;
+    }
+
+    @Override
+    public List<String> userLogout(UserDto userDto) {
+    List<String> response = new ArrayList<>();
+    SecurityContextHolder.clearContext();
+    response.add("Logout Successful");
+    return response;
     }
 }

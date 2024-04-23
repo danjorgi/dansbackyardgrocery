@@ -17,10 +17,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const bodyObj = {
-            username: registerUsername.value,
-            password: registerPassword.value,
-            email: registerEmail.value,
-            address: registerAddress.value
+            userName: registerUsername.value,
+            userPassword: registerPassword.value,
+            userEmail: registerEmail.value,
+            userAddress: registerAddress.value
         };
 
         try {

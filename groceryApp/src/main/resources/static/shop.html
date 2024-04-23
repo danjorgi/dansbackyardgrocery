@@ -11,6 +11,10 @@
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #42b883;">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Dan's Backyard Grocery <span class="text-secondary">Shop</span></a>
+            <ul class="navbar-nav">
+                <li class="nav-item" id="user-info">
+                </li>
+            </ul>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -67,6 +71,31 @@
         </div>
     </div>
 
+    <script>
+        function updateNavbar() {
+            const userInfo = document.getElementById('user-info');
+            const isAuthenticated = localStorage.getItem('isAuthenticated');
+            if (isAuthenticated) {
+                const username = localStorage.getItem('username');
+                userInfo.innerHTML = `
+                    <span class="nav-link text-white">Welcome, ${username}</span>
+                    <button class="btn btn-link nav-link" onclick="logout()">Logout</button>
+                `;
+            } else {
+                userInfo.innerHTML = `
+                    <a class="nav-link text-white" href="./login.html">Sign in</a>
+                `;
+            }
+        }
+    
+        function logout() {
+            localStorage.removeItem('isAuthenticated');
+            localStorage.removeItem('username');
+            window.location.href = './login.html';
+        }
+    
+        document.addEventListener('DOMContentLoaded', updateNavbar);
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="./javascript/shop.js" type="application/javascript"></script>
 </body>

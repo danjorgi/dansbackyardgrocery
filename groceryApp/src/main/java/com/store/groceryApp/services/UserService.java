@@ -10,4 +10,5 @@ public interface UserService {
 
     List<String> userLogin(UserDto userDto);
 
+    List<String> userLogout(UserDto userDto);
 }

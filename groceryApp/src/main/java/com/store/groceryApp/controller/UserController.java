@@ -25,12 +25,16 @@ public class UserController {
 
     @PostMapping("/register")
     public List<String> addUser(@RequestBody UserDto userDto) {
+        System.out.println("Recieved UserDto: " + userDto);
+        
         if(!StringUtils.hasText(userDto.getUserPassword())) {
+            System.out.println("Password is null or empty");
             return Collections.singletonList("Password cannot be null or empty");
         }
 
         String passHash = passwordEncoder.encode(userDto.getUserPassword());
         userDto.setUserPassword(passHash);
+        System.out.println("Encoded Password: " + passHash);
         return userService.addUser(userDto);
     }
 
