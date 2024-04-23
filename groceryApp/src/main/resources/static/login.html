@@ -35,7 +35,7 @@
     </nav>
     <div class="container-md">
         <h1>Login</h1>
-        <form id="login-form" action="./shop.html" method="GET">
+        <form id="login-form" method="POST">
             <div class="form-group">
                 <label for="register-username">Username</label>
                 <input type="text" class="form-control" name="username" id="login-username" placeholder="Username">
@@ -49,6 +49,7 @@
                 <a href="./register.html" class="btn btn-secondary">Register</a>
             </div>
         </form>
+        <div id="login-message" class="text-danger"></div>
     </div>
 
     <script>

@@ -40,9 +40,9 @@ public class UserServiceImpl implements UserService {
             UserEntity user = userOptional.get();
             if (passwordEncoder.matches(userDto.getUserPassword(), user.getUserPassword())) {
                 if (user.isAdmin()) {
-                    response.add("Admin Login Successfull");
+                    response.add("Admin Login Successful");
                 } else {
-                    response.add("User Login Successfull");
+                    response.add("User Login Successful");
                 }
                 response.add(String.valueOf(user.getId()));
             } else {
