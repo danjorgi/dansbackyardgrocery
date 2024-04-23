@@ -7,8 +7,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const username = document.getElementById('login-username').value;
         const password = document.getElementById('login-password').value;
 
+        console.log('Submitting login form with username:', username);
+
         try {
             const response = await loginUser(username, password);
+            console.log('Login response:', response);
             handleLoginResponse(response, username);
         } catch (error) {
             console.error('Error during login:', error);
@@ -17,6 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function loginUser(username, password) {
+    console.log('Sending login request for username:', username);
     const response = await fetch('/api/v1/users/login', {
         method: 'POST',
         headers: {
@@ -36,6 +40,7 @@ async function loginUser(username, password) {
 }
 
 function handleLoginResponse(response, username) {
+    console.log('Handling login response:', response);
     if (response.length > 0 && response[0].includes('Login Successful')) {
         const userId = response.length > 1 ? response[1] : null;
         localStorage.setItem('isAuthenticated', true);
