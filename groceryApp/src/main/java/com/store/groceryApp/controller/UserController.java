@@ -42,4 +42,9 @@ public class UserController {
     public List<String> userLogin(@RequestBody UserDto userDto) {
         return userService.userLogin(userDto);
     }
+
+    @PostMapping("/logout")
+    public List<String> userLogout(@RequestBody UserDto userDto) {
+        return userService.userLogout(userDto);
+    }
 }
