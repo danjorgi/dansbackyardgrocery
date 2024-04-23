@@ -7,7 +7,7 @@ import com.store.groceryApp.entities.ProductEntity;
 
 public interface ProductService {
 
-    ProductDto getProductByName(String productName);
+    List<ProductDto> getProductsByName(String name);
 
     List<ProductDto> getProductsByCategory(String category);
 

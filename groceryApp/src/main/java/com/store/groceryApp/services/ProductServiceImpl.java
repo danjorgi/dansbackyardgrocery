@@ -28,9 +28,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public ProductDto getProductByName(String productName) {
-        ProductEntity productEntity = productRepository.findByName(productName);
-        return productEntity != null ? new ProductDto(productEntity) : null;
+    public List<ProductDto> getProductsByName(String name) {
+        List<ProductEntity> products = productRepository.findByNameContainingIgnoreCase(name);
+        return products.stream()
+                       .map(ProductDto::new)
+                       .collect(Collectors.toList());
     }
 
     @Override

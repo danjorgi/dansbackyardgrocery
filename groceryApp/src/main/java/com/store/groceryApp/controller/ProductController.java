@@ -30,8 +30,8 @@ public class ProductController {
     }
 
     @GetMapping("/{productName}")
-    public ProductDto getProductByName(@PathVariable String productName) {
-        return productService.getProductByName(productName);
+    public List<ProductDto> getProductsByName(@PathVariable String productName) {
+        return productService.getProductsByName(productName);
     }
 
     @GetMapping("/category/{category}")
@@ -69,10 +69,14 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<ProductDto> getAllProducts() {
-        List<ProductEntity> products = productService.getAllProductsAlphabetically();
-        return products.stream()
-                       .map(ProductDto::new)
-                       .collect(Collectors.toList());
+    public List<ProductDto> getAllProducts(@RequestParam(required = false) String name) {
+        if (name != null && !name.isEmpty()) {
+            return productService.getProductsByName(name);
+        } else {
+            List<ProductEntity> products = productService.getAllProductsAlphabetically();
+            return products.stream()
+                           .map(ProductDto::new)
+                           .collect(Collectors.toList());
+        }
     }
 }

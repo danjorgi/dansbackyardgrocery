@@ -3,10 +3,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const categorySelect = document.querySelector('#category-select');
     const productList = document.querySelector('#product-list');
     const showAllButton = document.querySelector('#show-all');
+    const searchButton = document.querySelector('#search-button');
 
     // Function to fetch and display products based on search query
-    async function fetchProductsBySearchQuery(searchQuery) {
-        const url = `/api/v1/products/${searchQuery}`;
+    async function fetchProductsByName(searchQuery) {
+        const url = `/api/v1/products?name=${encodeURIComponent(searchQuery)}`;
         try {
             const response = await fetch(url);
             if (!response.ok) {
@@ -163,7 +164,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Event listeners
-    searchInput.addEventListener('input', fetchAndDisplayProducts);
+    searchButton.addEventListener('click', () => {
+        console.log('Search button clicked');
+        fetchProductsByName(searchInput.value.trim());
+    });
     categorySelect.addEventListener('change', fetchAndDisplayProducts);
     showAllButton.addEventListener('click', () => {
         fetchAllProducts();
