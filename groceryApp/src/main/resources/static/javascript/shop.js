@@ -4,22 +4,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const productList = document.querySelector('#product-list');
     const showAllButton = document.querySelector('#show-all');
 
-    // Function to fetch and display products based on search and category filters
-    async function fetchAndDisplayProducts() {
-        const searchQuery = searchInput.value.trim();
-        const category = categorySelect.value;
-    
-        let url = '/api/v1/products';
-    
-        // If there's a search query, append it to the URL
-        if (searchQuery) {
-            url += `/${searchQuery}`;
-        } else if (category !== 'All') { // If there's a selected category, append it to the URL
-            url += `/category/${category}`;
-        } else { // If neither search query nor category is specified, fetch all products
-            url += `/`;
-        }
-    
+    // Function to fetch and display products based on search query
+    async function fetchProductsBySearchQuery(searchQuery) {
+        const url = `/api/v1/products/${searchQuery}`;
         try {
             const response = await fetch(url);
             if (!response.ok) {
@@ -29,6 +16,50 @@ document.addEventListener("DOMContentLoaded", () => {
             displayProducts(products);
         } catch (error) {
             console.error('Error fetching products:', error);
+        }
+    }
+
+    // Function to fetch and display products based on category
+    async function fetchProductsByCategory(category) {
+        const url = `/api/v1/products/category/${category}`;
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('Failed to fetch products');
+            }
+            const products = await response.json();
+            displayProducts(products);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    }
+
+    // Function to fetch and display all products
+    async function fetchAllProducts() {
+        const url = '/api/v1/products';
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('Failed to fetch products');
+            }
+            const products = await response.json();
+            displayProducts(products);
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    }
+
+    // Function to fetch and display products based on search and category filters
+    async function fetchAndDisplayProducts() {
+        const searchQuery = searchInput.value.trim();
+        const category = categorySelect.value;
+    
+        if (searchQuery) {
+            fetchProductsBySearchQuery(searchQuery);
+        } else if (category !== 'All') {
+            fetchProductsByCategory(category);
+        } else {
+            fetchAllProducts();
         }
     }
 
@@ -48,23 +79,31 @@ document.addEventListener("DOMContentLoaded", () => {
     // Function to create a product card
     function createProductCard(product) {
         const card = document.createElement('div');
-        card.classList.add('card', 'mb-3');
-
+        card.classList.add('col-md-4', 'mb-3'); // Added 'col-md-4' class for Bootstrap grid system
+    
+        const cardInner = document.createElement('div');
+        cardInner.classList.add('card', 'h-100'); // Added 'h-100' class to make all cards in a row have equal height
+    
+        const image = document.createElement('img'); // Create an image element
+        image.src = product.imageUrl; // Set the image source to the URL from the product object
+        image.classList.add('card-img-top'); // Add 'card-img-top' class for Bootstrap to place the image at the top of the card
+        image.alt = product.name; // Set the alt attribute to the product name for accessibility
+    
         const cardBody = document.createElement('div');
         cardBody.classList.add('card-body');
-
+    
         const productName = document.createElement('h5');
         productName.classList.add('card-title');
         productName.textContent = product.name;
-
+    
         const productDescription = document.createElement('p');
         productDescription.classList.add('card-text');
         productDescription.textContent = product.description;
-
+    
         const productPrice = document.createElement('p');
         productPrice.classList.add('card-text');
         productPrice.textContent = `Price: $${product.price}`;
-
+    
         const quantityLabel = document.createElement('label');
         quantityLabel.textContent = 'Quantity:';
         const quantityInput = document.createElement('input');
@@ -72,22 +111,25 @@ document.addEventListener("DOMContentLoaded", () => {
         quantityInput.min = '1';
         quantityInput.value = '1';
         quantityInput.classList.add('form-control', 'mb-2');
-
+    
         const addToCartButton = document.createElement('button');
         addToCartButton.textContent = 'Add to Cart';
         addToCartButton.classList.add('btn', 'btn-primary', 'mb-2');
         addToCartButton.addEventListener('click', () => {
             addToCart(product.id, parseInt(quantityInput.value, 10));
         });
-
+    
         cardBody.appendChild(productName);
         cardBody.appendChild(productDescription);
         cardBody.appendChild(productPrice);
         cardBody.appendChild(quantityLabel);
         cardBody.appendChild(quantityInput);
         cardBody.appendChild(addToCartButton);
-
-        card.appendChild(cardBody);
+    
+        cardInner.appendChild(image);
+        cardInner.appendChild(cardBody);
+    
+        card.appendChild(cardInner);
         return card;
     }
 
@@ -124,11 +166,8 @@ document.addEventListener("DOMContentLoaded", () => {
     searchInput.addEventListener('input', fetchAndDisplayProducts);
     categorySelect.addEventListener('change', fetchAndDisplayProducts);
     showAllButton.addEventListener('click', () => {
-        searchInput.value = '';
-        categorySelect.value = 'All';
-        fetchAndDisplayProducts();
+        fetchAllProducts();
     });
 
-    // Initial fetch and display of products
     fetchAndDisplayProducts();
 });
