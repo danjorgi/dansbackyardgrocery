@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const category = categorySelect.value;
     
         if (searchQuery) {
-            fetchProductsBySearchQuery(searchQuery);
+            fetchProductsByName(searchQuery);
         } else if (category !== 'All') {
             fetchProductsByCategory(category);
         } else {
