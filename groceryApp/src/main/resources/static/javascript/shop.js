@@ -4,6 +4,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const productList = document.querySelector('#product-list');
     const showAllButton = document.querySelector('#show-all');
     const searchButton = document.querySelector('#search-button');
+    const cartCountElement = document.querySelector('#cart-count');
+    const cartCounterElement = document.querySelector('#cart-counter');
+    const orderButton = document.querySelector('.order-btn');
+
+    updateCartCount();
 
     // Function to fetch and display products based on search query
     async function fetchProductsByName(searchQuery) {
@@ -44,7 +49,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 throw new Error('Failed to fetch products');
             }
             const products = await response.json();
-            displayProducts(products);
+            if (productList) {
+                displayProducts(products);
+            }
         } catch (error) {
             console.error('Error fetching products:', error);
         }
@@ -52,12 +59,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Function to fetch and display products based on search and category filters
     async function fetchAndDisplayProducts() {
-        const searchQuery = searchInput.value.trim();
-        const category = categorySelect.value;
-    
+        const searchQuery = searchInput && searchInput.value ? searchInput.value.trim() : '';
+        const category = categorySelect && categorySelect.value ? categorySelect.value : '';
+        
         if (searchQuery) {
             fetchProductsByName(searchQuery);
-        } else if (category !== 'All') {
+        } else if (category) {
             fetchProductsByCategory(category);
         } else {
             fetchAllProducts();
@@ -66,13 +73,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Function to display products as cards
     function displayProducts(products) {
-        productList.innerHTML = '';
+        if (!productList) {
+            console.error('Product list element not found.');
+            return;
+        }
         if (products.length === 0) {
             productList.innerHTML = '<p>No products found</p>';
             return;
         }
+        productList.innerHTML = ''; // Clear any previous content
         products.forEach(product => {
             const card = createProductCard(product);
+            card.querySelector('.btn-primary').addEventListener('click', () => {
+                const productId = product.id;
+                const quantityInput = card.querySelector('.form-control');
+                const quantity = parseInt(quantityInput.value, 10);
+                addToCart(product.id, product.name, product.description, product.price, quantity);
+            })
             productList.appendChild(card);
         });
     }
@@ -80,15 +97,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // Function to create a product card
     function createProductCard(product) {
         const card = document.createElement('div');
-        card.classList.add('col-md-4', 'mb-3'); // Added 'col-md-4' class for Bootstrap grid system
+        card.classList.add('col-md-4', 'mb-3');
     
         const cardInner = document.createElement('div');
-        cardInner.classList.add('card', 'h-100'); // Added 'h-100' class to make all cards in a row have equal height
+        cardInner.classList.add('card', 'h-100');
     
-        const image = document.createElement('img'); // Create an image element
-        image.src = product.imageUrl; // Set the image source to the URL from the product object
-        image.classList.add('card-img-top'); // Add 'card-img-top' class for Bootstrap to place the image at the top of the card
-        image.alt = product.name; // Set the alt attribute to the product name for accessibility
+        const image = document.createElement('img');
+        image.src = product.imageUrl;
+        image.classList.add('card-img-top');
+        image.alt = product.name;
     
         const cardBody = document.createElement('div');
         cardBody.classList.add('card-body');
@@ -116,9 +133,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const addToCartButton = document.createElement('button');
         addToCartButton.textContent = 'Add to Cart';
         addToCartButton.classList.add('btn', 'btn-primary', 'mb-2');
-        addToCartButton.addEventListener('click', () => {
-            addToCart(product.id, parseInt(quantityInput.value, 10));
-        });
     
         cardBody.appendChild(productName);
         cardBody.appendChild(productDescription);
@@ -135,43 +149,142 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Function to add a product to the cart
-    async function addToCart(productId, quantity) {
-        const userId = localStorage.getItem('userId');
-        if (!userId) {
-            console.error('User not authenticated');
-            return;
-        }
-
-        try {
-            const response = await fetch('/api/v1/products/addToCart', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams({
-                    productId: productId,
-                    userId: userId,
-                    quantity: quantity
-                })
-            });
-            if (!response.ok) {
-                throw new Error('Failed to add product to cart');
-            }
-            console.log('Product added to cart');
-        } catch (error) {
-            console.error('Error adding product to cart:', error);
-        }
+    function addToCart(productId, name, description, price, quantity) {
+        const cartItem = {
+            productId: productId,
+            name: name,
+            description: description,
+            price: price,
+            quantity: quantity
+        };
+        let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+        cartItems.push(cartItem);
+        localStorage.setItem('cartItems', JSON.stringify(cartItems));
+        updateCartCount();
     }
 
     // Event listeners
-    searchButton.addEventListener('click', () => {
-        console.log('Search button clicked');
-        fetchProductsByName(searchInput.value.trim());
-    });
-    categorySelect.addEventListener('change', fetchAndDisplayProducts);
-    showAllButton.addEventListener('click', () => {
-        fetchAllProducts();
-    });
+    if (searchButton) {
+        searchButton.addEventListener('click', () => {
+            console.log('Search button clicked');
+            fetchProductsByName(searchInput.value.trim());
+        });
+    }
 
-    fetchAndDisplayProducts();
+    if (categorySelect) {
+        categorySelect.addEventListener('change', fetchAndDisplayProducts);
+    }
+    
+    if (showAllButton) {
+        showAllButton.addEventListener('click', fetchAllProducts);
+    }
+
+    if (orderButton) {
+        orderButton.addEventListener('click', () => {
+            console.log('Order button clicked');
+            const isAuthenticated = localStorage.getItem('isAuthenticated');
+            console.log('Is authenticated:', isAuthenticated);
+        
+            if (isAuthenticated) {
+                const message = `Your order is complete. Thanks for shopping with us!`;
+                alert(message);
+                console.log('Cart before clearing:', localStorage.getItem('cartItems'));
+                clearCart();
+                console.log('Cart after clearing:', localStorage.getItem('cartItems'));
+                displayCartItems();
+            } else {
+                alert("Please log in to complete your order. If you do not have an account, please register.");
+            }
+        });
+    }
+
+    fetchAllProducts();
+
+    function clearCart() {
+        localStorage.removeItem('cartItems');
+        updateCartCount();
+    }
+
+    // Function to create a cart item card
+    function createCartItemCard(item) {
+        const card = document.createElement('div');
+        card.classList.add('card', 'mb-3');
+
+        const cardBody = document.createElement('div');
+        cardBody.classList.add('card-body', 'd-flex', 'justify-content-between', 'align-items-center');
+
+        const productName = document.createElement('h5');
+        productName.classList.add('card-title');
+        productName.textContent = item.name;
+
+        const quantity = document.createElement('span');
+        quantity.textContent = `Quantity: ${item.quantity}`;
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.classList.add('btn', 'btn-danger');
+        deleteButton.addEventListener('click', () => {
+            removeFromCart(item.productId);
+        });
+
+        cardBody.appendChild(productName);
+        cardBody.appendChild(quantity);
+        cardBody.appendChild(deleteButton);
+
+        card.appendChild(cardBody);
+        return card;
+    }
+
+    // Function to remove a product from the cart
+    function removeFromCart(productId) {
+        let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+        cartItems = cartItems.filter(item => item.productId !== productId);
+        localStorage.setItem('cartItems', JSON.stringify(cartItems));
+        displayCartItems();
+        updateCartCount();
+    }
+
+    // Function to update the cart count in the navbar
+    function updateCartCount() {
+        const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+        const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+        // Check if the element with ID 'cart-count' exists before updating its textContent
+        const cartCountElement = document.getElementById('cart-count');
+        if (cartCountElement) {
+            cartCountElement.textContent = cartCount;
+        }
+
+        if (cartCounterElement) {
+            cartCounterElement.textContent = cartCount;
+        }
+    }
+
+    // Add other functions from shop.js as needed
+
+    // Event listener to display cart items when the cart page loads
+    if (window.location.pathname.includes('cart.html')) {
+        displayCartItems();
+    }
+
+    // Function to display cart items on the cart page
+    function displayCartItems() {
+    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+    const cartList = document.querySelector('#cart-list');
+    if (!cartList) {
+        console.error('Cart list element not found.');
+        return;
+    }
+
+    cartList.innerHTML = '';
+
+    cartItems.forEach(item => {
+        const card = createCartItemCard(item);
+        cartList.appendChild(card);
+    });
+    }
+
+    // Event listener to display cart items when the cart page loads
+    if (window.location.pathname.includes('cart.html')) {
+        displayCartItems();
+    }
 });
