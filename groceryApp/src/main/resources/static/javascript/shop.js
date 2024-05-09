@@ -81,14 +81,14 @@ document.addEventListener("DOMContentLoaded", () => {
             productList.innerHTML = '<p>No products found</p>';
             return;
         }
-        productList.innerHTML = ''; // Clear any previous content
+        productList.innerHTML = '';
         products.forEach(product => {
             const card = createProductCard(product);
             card.querySelector('.btn-primary').addEventListener('click', () => {
                 const productId = product.id;
                 const quantityInput = card.querySelector('.form-control');
                 const quantity = parseInt(quantityInput.value, 10);
-                addToCart(product.id, product.name, product.description, product.price, quantity);
+                addToCart(product.id, product.name, product.description, product.price, quantity, product.imageUrl);
             })
             productList.appendChild(card);
         });
@@ -149,16 +149,25 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Function to add a product to the cart
-    function addToCart(productId, name, description, price, quantity) {
+    function addToCart(productId, name, description, price, quantity, imageUrl) {
         const cartItem = {
             productId: productId,
             name: name,
             description: description,
             price: price,
-            quantity: quantity
+            quantity: quantity,
+            imageUrl: imageUrl
         };
+    
         let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-        cartItems.push(cartItem);
+        const existingItemIndex = cartItems.findIndex(item => item.productId === productId);
+    
+        if (existingItemIndex !== -1) {
+            cartItems[existingItemIndex].quantity += quantity;
+        } else {
+            cartItems.push(cartItem);
+        }
+    
         localStorage.setItem('cartItems', JSON.stringify(cartItems));
         updateCartCount();
     }
@@ -208,30 +217,61 @@ document.addEventListener("DOMContentLoaded", () => {
     // Function to create a cart item card
     function createCartItemCard(item) {
         const card = document.createElement('div');
-        card.classList.add('card', 'mb-3');
-
+        card.classList.add('card', 'h-100');
+    
+        const cardInner = document.createElement('div');
+        cardInner.classList.add('card-inner');
+    
+        const productImage = document.createElement('img');
+        productImage.src = item.imageUrl;
+        productImage.classList.add('card-img-top', 'cart-product-image');
+        productImage.alt = item.name;
+    
         const cardBody = document.createElement('div');
-        cardBody.classList.add('card-body', 'd-flex', 'justify-content-between', 'align-items-center');
-
+        cardBody.classList.add('card-body');
+    
+        const productDetails = document.createElement('div');
+        productDetails.classList.add('cart-product-details');
+    
         const productName = document.createElement('h5');
         productName.classList.add('card-title');
         productName.textContent = item.name;
-
-        const quantity = document.createElement('span');
-        quantity.textContent = `Quantity: ${item.quantity}`;
-
+    
+        const productPrice = document.createElement('p');
+        productPrice.classList.add('card-text');
+        productPrice.textContent = `Price: $${item.price}`;
+    
+        const quantityLabel = document.createElement('label');
+        quantityLabel.textContent = 'Quantity:';
+        const quantityInput = document.createElement('input');
+        quantityInput.type = 'number';
+        quantityInput.min = '1';
+        quantityInput.value = item.quantity;
+        quantityInput.classList.add('form-control', 'mb-2');
+        quantityInput.addEventListener('input', () => {
+            updateQuantity(item.productId, parseInt(quantityInput.value));
+        });
+    
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Delete';
-        deleteButton.classList.add('btn', 'btn-danger');
+        deleteButton.classList.add('btn', 'btn-danger', 'mt-2');
         deleteButton.addEventListener('click', () => {
             removeFromCart(item.productId);
         });
-
-        cardBody.appendChild(productName);
-        cardBody.appendChild(quantity);
-        cardBody.appendChild(deleteButton);
-
-        card.appendChild(cardBody);
+    
+        productDetails.appendChild(productName);
+        productDetails.appendChild(productPrice);
+        productDetails.appendChild(quantityLabel);
+        productDetails.appendChild(quantityInput);
+        productDetails.appendChild(deleteButton);
+    
+        cardBody.appendChild(productDetails);
+    
+        cardInner.appendChild(productImage);
+        cardInner.appendChild(cardBody);
+    
+        card.appendChild(cardInner);
+    
         return card;
     }
 
@@ -248,7 +288,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateCartCount() {
         const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
         const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
-        // Check if the element with ID 'cart-count' exists before updating its textContent
         const cartCountElement = document.getElementById('cart-count');
         if (cartCountElement) {
             cartCountElement.textContent = cartCount;
@@ -259,7 +298,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Add other functions from shop.js as needed
 
     // Event listener to display cart items when the cart page loads
     if (window.location.pathname.includes('cart.html')) {
@@ -268,19 +306,66 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Function to display cart items on the cart page
     function displayCartItems() {
-    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-    const cartList = document.querySelector('#cart-list');
-    if (!cartList) {
-        console.error('Cart list element not found.');
-        return;
+        const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+        const cartList = document.querySelector('#cart-list');
+        if (!cartList) {
+            console.error('Cart list element not found.');
+            return;
+        }
+    
+        cartList.innerHTML = '';
+    
+        let totalPrice = 0; // Initialize total price variable
+    
+        for (let i = 0; i < cartItems.length; i += 3) {
+            const row = document.createElement('div');
+            row.classList.add('row', 'mb-3');
+    
+            for (let j = i; j < i + 3 && j < cartItems.length; j++) {
+                const item = cartItems[j];
+                const card = createCartItemCard(item);
+                const col = document.createElement('div');
+                col.classList.add('col-md-4', 'mb-3');
+                col.appendChild(card);
+                row.appendChild(col);
+    
+                // Add item price to total price
+                totalPrice += item.price * item.quantity;
+            }
+    
+            cartList.appendChild(row);
+        }
+    
+        // Display total price
+        const totalPriceElement = document.getElementById('total-price');
+        totalPriceElement.textContent = `Total Price: $${totalPrice.toFixed(2)}`;
     }
 
-    cartList.innerHTML = '';
+    // Function to update the quantity of a product in the cart
+    function updateQuantity(productId, newQuantity) {
+        let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+        const itemIndex = cartItems.findIndex(item => item.productId === productId);
 
-    cartItems.forEach(item => {
-        const card = createCartItemCard(item);
-        cartList.appendChild(card);
-    });
+        if (itemIndex !== -1) {
+            cartItems[itemIndex].quantity = newQuantity;
+            localStorage.setItem('cartItems', JSON.stringify(cartItems));
+            displayCartItems(); // Update cart items display
+            updateCartCount(); // Update cart count in the navbar
+            updateTotalPrice(); // Update total price display
+        }
+    }
+
+    // Function to update the total price based on cart items
+    function updateTotalPrice() {
+        const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+        let totalPrice = 0;
+
+        cartItems.forEach(item => {
+            totalPrice += item.price * item.quantity;
+        });
+
+        const totalPriceElement = document.getElementById('total-price');
+        totalPriceElement.textContent = `Total Price: $${totalPrice.toFixed(2)}`;
     }
 
     // Event listener to display cart items when the cart page loads

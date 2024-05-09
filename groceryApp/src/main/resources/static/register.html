@@ -74,6 +74,7 @@
         }
     
         function logout() {
+            localStorage.removeItem('cartItems');
             localStorage.removeItem('isAuthenticated');
             localStorage.removeItem('username');
             window.location.href = './login.html';
